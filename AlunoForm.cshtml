@@ -1,0 +1,72 @@
+@using Exemplo.Model;
+@model Exemplo.Model.Aluno
+
+@{
+    ViewBag.Title = "Aluno";
+    Aluno aluno = new Aluno();
+    UF uf = new UF();
+
+    if (Model != null)
+    {
+        aluno = @Model;
+    }
+    else
+    {
+        aluno.uf = new UF();
+    }
+}
+<table>
+    <thead>
+        <tr>
+            <td colspan="2" style="text-align: center">
+                <hr /><font size="3"><b>Dados do Aluno</b></font></hr>
+                <hr />
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                @Html.LabelFor(x => x.nom_aluno)
+            </td>
+            <td>
+                @Html.LabelFor(x => x.num_cpf)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.TextBoxFor(x => x.nom_aluno, htmlAttributes: new
+                {
+                    @title = "Nome do Aluno",
+                    @alt = "Nome do Aluno",
+                    @style = "width: 200px;",
+                })
+            </td>
+            <td>
+                @Html.TextBoxFor(x => x.num_cpf, htmlAttributes: new
+                {
+                    @title = "CPF do Aluno",
+                    @alt = "CPF do Aluno",
+                    @style = "width: 200px;"
+                })
+            </td>
+            <td>
+                @Html.DropDownListFor(x => x.uf.cod_uf, new SelectList(uf.listar(), "cod_uf", "nom_uf", aluno.uf.cod_uf), "Selecione", new { @style = "width: 70px"})
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="2" style="text-align: center">
+                <input type="button" value="Gravar" id="btnGravar" name="btnGravar" />
+                <input type="button" value="Alterar" id="btnAlterar" name="btnAlterar" />
+                <input type="button" value="Consultar" id="btnConsultar" name="btnConsultar" />
+                <input type="button" value="Limpar" id="btnLimpar" name="btnLimpar" />
+            </td>
+        </tr>
+    </tfoot>
+</table>
+@Html.TextBoxFor(x => x.cod_aluno, htmlAttributes: new
+{
+    @type = "hidden"
+})
