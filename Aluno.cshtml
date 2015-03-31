@@ -1,0 +1,18 @@
+@using Exemplo.Model;
+@model Exemplo.Model.Aluno
+
+@{
+    ViewBag.Title = "Aluno";
+    Aluno aluno = new Aluno();
+
+}
+<script src="@Url.Content("~/Scripts/Aluno/Aluno.js")" type="text/javascript" charset="iso-8859-1"></script>
+
+<br />
+<div id="divForm">
+    @{
+        Html.RenderPartial("AlunoForm");
+    }
+</div>
+<div id="divConsulta">
+</div>
