@@ -1,0 +1,48 @@
+
+@using Exemplo.Model;
+@{
+    Layout = null;
+    Aluno aluno = new Aluno();
+    List<Aluno> listAluno = new List<Aluno>();
+    listAluno = @Model;
+}
+<br>
+<table class="display" id="dtAluno">
+    <thead>
+        <tr>
+            <th style="text-align: center">
+                @Html.LabelFor(x => aluno.nom_aluno)
+            </th>
+            <th style="text-align: center">
+                @Html.LabelFor(x => aluno.num_cpf)
+            </th>
+            <th style="text-align: center">
+                @Html.Label("Editar")
+            </th>
+            <th style="text-align: center">
+                @Html.Label("Excluir")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var item in listAluno)
+            {
+                <tr>
+                    <td>
+                        @item.nom_aluno
+                    </td>
+                    <td>
+                        @(item.num_cpf)
+                    </td>
+                    <td style="text-align: center">
+                        <img src="~/Content/Imagens/editar.gif" style="cursor:pointer" id="imgVisualizar" onclick="VisualizarFuncionario('@item.cod_aluno')" />
+                    </td>
+                    <td style="text-align: center">
+                        <img src="~/Content/Imagens/excluir.jpg" style="cursor:pointer" onclick="ExcluirFuncionario('@item.cod_aluno')" />
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
