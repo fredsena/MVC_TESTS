@@ -1,0 +1,175 @@
+@model ViewModels.Usuario
+@{
+    //ViewBag.Title = "Pesquisar ";
+    ViewBag.Current = " Cadastro / Usuário / Pesquisar";
+    Html.EnableClientValidation(false);
+
+    var id = ViewBag.IdeIns != null ? ViewBag.IdeIns : 1;
+}
+
+@using (Html.BeginForm("Pesquisar", "Usuario", FormMethod.Post, new { @id = "formPesquisa", @class = "form", @role = "form" }))
+{
+    <section class="panel panel-default">
+        <article class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="sistemas">Sistema</label>
+                        @Html.DropDownListFor(x => x.IdeSistema, (SelectList)ViewBag.Sistemas, "Selecione", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group has-feedback">
+                        <label class="control-label" for="login">Login</label>
+                        @Html.TextBoxFor(x => x.DscLogin, new { @class = "form-control", @maxlength = "20" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="control-label" for="tpUsuario">Tipo de Usuário</label>
+                        @Html.DropDownListFor(x => x.IdcTipoUsuario, null, "Selecione", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-12"><div class="line line-dashed b-b line-lg pull-in"></div></div>
+                <div class="col-md-4">
+                    <label class="control-label required" for="instituição">Instituição</label>
+                    <div class="input-group m-n">
+                        <input type="hidden" id="IdeInstituicao" name="IdeInstituicao" value="@id"  />
+                        @Html.TextBox("NomeInstituicao", "", new { @class = "form-control", @readonly = "readonly", @placeholder = "" })
+                        <span class="input-group-addon" style="cursor:pointer"
+                              data-toggle="modal"
+                              data-target="#Modalinstituicao"
+                              data-targetidhidden="IdeInstituicao"
+                              data-targetinputhidden="NomeInstituicao">
+                            <i class="fa fa-search text-muted"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4" id="idUorg">
+                    <div class="form-group">
+                        <label class="control-label" for="uorg">Unidade Organizacional</label>
+                        @Html.DropDownListFor(x => x.IdeUnidadeOrganizacional, (SelectList)ViewBag.unidadeOrganizacional, "Selecione", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.IdeUnidadeOrganizacional)
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group ">
+                        <label class="control-label" for="situação">Situação</label>
+                        @Html.DropDownList("IdcAtivo", new List<SelectListItem> {
+                                                        new SelectListItem{ Text="Selecione", Value = "", Selected = true },
+                                                        new SelectListItem{ Text="Ativo", Value = "S" },
+                                                        new SelectListItem{ Text="Inativo", Value = "N" }
+                                                    }, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+        </article>
+
+        <footer class="panel-footer">
+            <button type="button" class="btn btn-primary btnPesquisar"><i class="fa fa-search"></i> Pesquisar</button>
+            <a href=@Url.Action("Incluir", "Usuario") class="btn btn-default perfil-acesso"><i class="fa fa-plus-circle"></i> Incluir</a>
+            <div class="pull-right">
+                <a id="btnRelatorio" class="btn btn-s-md btn-success perfil-acesso usuario-exportarpesquisa" data-loading="false"><i class="fa fa-file-excel-o"></i> Exportar</a>
+            </div>
+        </footer>
+    </section>
+}
+
+<div class="panel panel-default hide datatable table-responsive">
+    <table id="gridUsuarioSistema"
+           class="table table-striped b-t b-light table-bordered table-hover datatable"
+           data-crud="true"
+           data-form-id="formPesquisa"
+           data-object-id="IdeUsuario"
+           data-controller="Usuario"
+           data-columns-data="DscLogin,NomUsuario,DscTipoUsuario,NomeInstituicao,DtUltimoAcesso,IdcAtivo,IdcBloqueado,IdcExcluido"
+           data-columns-title="Login,Nome,Tipo,Instituição,Último Acesso,Situação,Bloqueado,Excluido"
+           data-function-delete="verificarExclusao"
+           data-function-row="AddImage"></table>
+</div>
+
+@Html.Partial("~/Views/Custom/Pesquisainstituicao.cshtml")
+
+@section customsJs {
+    <script type="text/javascript">
+        function excluirRegistro(id) {
+
+            $.ajax({
+                url: "/Usuario/Excluir/" + id,
+                success: function (data) {
+                    if (data.Ok != null) {
+                        window.location.href = "/Usuario/Pesquisar";
+                    } else {
+                        var msg = "Usuário não possui permissão de acesso a essa funcionalidade.";
+                        app.callMsg(msg.text(), "Erro");
+                    }
+                }
+            });
+        };
+
+        function verificarExclusao(id) {
+            $.ajax({
+                url: "/Usuario/VerificarExclusao",
+                success: function (data) {
+                    if (data != null) {
+                        app.callMsg(data.Descricao, data.Tipo, "excluirRegistro", id.toString());
+                    };
+                }
+            });
+        }
+
+        function AddImage(row, data, index) {
+            if (data.IdcAtivo == "S") {
+                $('td', row).eq(5).html('<i class="fa fa-check text-success"></i>')
+                $('td', row).eq(5).addClass("text-center");
+
+            }
+            else {
+                $('td', row).eq(5).html('<i class="fa fa-close text-danger"></i>')
+                $('td', row).eq(5).addClass("text-center");
+            }
+
+            if (data.IdcBloqueado == "S") {
+                $('td', row).eq(6).html('<i class="fa fa-check text-success"></i>')
+                $('td', row).eq(6).addClass("text-center");
+
+            }
+            else {
+                $('td', row).eq(6).html('<i class="fa fa-close text-danger"></i>')
+                $('td', row).eq(6).addClass("text-center");
+            }
+
+            if (data.IdcExcluido == "S") {
+                $('td', row).eq(7).html('<i class="fa fa-check text-success"></i>')
+                $('td', row).eq(7).addClass("text-center");
+
+            }
+            else {
+                $('td', row).eq(7).html('<i class="fa fa-close text-danger"></i>')
+                $('td', row).eq(7).addClass("text-center");
+            }
+        }
+
+        $(document).ready(function () {
+            $('#btnRelatorio').click(function () {
+
+                @{
+                    TempData["Titulo"] = ViewBag.Title;
+                }
+
+                var form = $("#formPesquisa").serialize();
+                $.post("/Usuario/ExportarPesquisa", form, function (data) {
+                    if (data.ret) {
+                        window.open("/Relatorio/Index");
+                    }
+                    else {
+                        var msg = "Usuário não ";
+                        app.callMsg(msg.text(), "Erro");
+                    }
+                });
+            });
+        });
+
+    </script>
+}
